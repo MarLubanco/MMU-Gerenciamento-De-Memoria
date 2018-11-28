@@ -1,6 +1,8 @@
 import exception.ConfigException;
 import model.ConfigSystem;
+import model.Processo;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class CommandReader {
@@ -11,7 +13,7 @@ public class CommandReader {
 
   ExecuteCommand command = new ExecuteCommand();
 
-  public void run() throws ConfigException {
+  public void run() throws Exception {
     while (true) {
       showDefaultPrompt();
       String comando = scanner.nextLine();
@@ -23,7 +25,7 @@ public class CommandReader {
     System.out.print("> ");
   }
 
-  public void comandos(String comando) throws ConfigException {
+  public void comandos(String comando) throws Exception {
     if ("configurar".equals(comando)) {
       command.configMachine();
     } else if ("ajuda".equals(comando)) {
@@ -31,7 +33,7 @@ public class CommandReader {
     } else if ("processo".equals(comando)) {
       command.startProcess();
     } else if ("acesso".equals(comando)) {
-      System.out.println("Não existe esse comando");
+      command.acessoMemoriaFindProcesso();
     } else if ("terminar".equals(comando)) {
       System.out.println("Não existe esse comando");
     } else if ("relatorio".equals(comando)) {
@@ -41,6 +43,11 @@ public class CommandReader {
     }
   }
 
+  /**
+   * Transforma o hexadecimal em decimal
+   * @param s
+   * @return
+   */
   public static int hex2decimal(String s) {
     String digits = "0123456789ABCDEF";
     s = s.toUpperCase();
