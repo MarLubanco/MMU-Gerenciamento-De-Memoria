@@ -116,8 +116,19 @@ public class ExecuteCommand {
     }
     System.out.println("           ACESSO A MEMÓRIA          ");
     System.out.println("-------------------------------------");
-    System.out.println("Processo acessado\npid: " + pid +
-            "\nEndereço de memória: " + endereco.get(0) + "-" + endereco.get(endereco.size()-1));
+    System.out.print("Processo acessado\npid: " + pid);
+    System.out.println("\nEndereço de memória: " + endereco.get(0) + "-" + endereco.get(endereco.size()-1));
+  }
+
+  public void relatorio() {
+    clusterMemoria.stream()
+            .distinct()
+            .forEach(processo -> System.out.println("Memoria Principal - processo - PID: " + processo.getPid() +
+                    " tamanho: " + processo.getMemoria()));
+    memoriaInterna.stream()
+            .distinct()
+            .forEach(processo -> System.out.println("Memoria Interna - processo - PID: " + processo.getPid() +
+                    " tamanho: " + processo.getMemoria()));
   }
 
 }

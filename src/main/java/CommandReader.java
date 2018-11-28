@@ -37,7 +37,7 @@ public class CommandReader {
     } else if ("terminar".equals(comando)) {
       System.out.println("Não existe esse comando");
     } else if ("relatorio".equals(comando)) {
-      System.out.println("Não existe esse comando");
+      command.relatorio();
     } else {
       System.out.println("Não existe esse comando");
     }
