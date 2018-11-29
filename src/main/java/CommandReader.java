@@ -35,7 +35,7 @@ public class CommandReader {
     } else if ("acesso".equals(comando)) {
       command.acessoMemoriaFindProcesso();
     } else if ("terminar".equals(comando)) {
-      System.out.println("Não existe esse comando");
+      command.terminar();
     } else if ("relatorio".equals(comando)) {
       command.relatorio();
     } else {

@@ -3,6 +3,7 @@ import model.ConfigSystem;
 import model.Processo;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ExecuteCommand {
   private Map<Integer,Processo> lista = new HashMap<Integer, Processo>();
@@ -89,8 +90,8 @@ public class ExecuteCommand {
     configuracoes = new ConfigSystem(memoriaA, (memoriaFisicaValue > 0 ? memoriaFisicaValue : value));
     System.out.println("Configurações");
     System.out.println("--------------------------------------------------");
-    System.out.println("Memória bits: " + memoriaA);
-    System.out.println("Memoria Física: " + (memoriaFisicaValue > 0 ? memoriaFisicaValue : value));
+    System.out.println("Memória RAM (bits): " + memoriaA);
+    System.out.println("Memoria Interna (bits): " + (memoriaFisicaValue > 0 ? memoriaFisicaValue : value));
   }
 
   /**
@@ -101,8 +102,10 @@ public class ExecuteCommand {
     System.out.print("PID do processo: ");
     ArrayList<Integer> endereco = new ArrayList<>();
     int pid = scanner.nextInt();
+    String local = null;
     for( int i=0 ; i < clusterMemoria.size(); i++) {
       if(clusterMemoria.get(i).getPid() == pid) {
+        local = "RAM";
         endereco.add(i);
       }
     }
@@ -110,6 +113,7 @@ public class ExecuteCommand {
     if(endereco.size() == 0) {
       for( int i=0 ; i < memoriaInterna.size(); i++) {
         if(memoriaInterna.get(i).getPid() == pid) {
+          local = "Interna";
           endereco.add(i);
         }
       }
@@ -117,18 +121,41 @@ public class ExecuteCommand {
     System.out.println("           ACESSO A MEMÓRIA          ");
     System.out.println("-------------------------------------");
     System.out.print("Processo acessado\npid: " + pid);
-    System.out.println("\nEndereço de memória: " + endereco.get(0) + "-" + endereco.get(endereco.size()-1));
+    System.out.println("\nEndereço de memória " + local + ": " + endereco.get(0) + "-" + endereco.get(endereco.size()-1));
   }
 
+  /**
+   * Mostra todos os processos que estão em execução
+   */
   public void relatorio() {
+    if (clusterMemoria == null) {
+      System.out.println("Não existe processos ainda");
+    }
     clusterMemoria.stream()
             .distinct()
             .forEach(processo -> System.out.println("Memoria Principal - processo - PID: " + processo.getPid() +
                     " tamanho: " + processo.getMemoria()));
-    memoriaInterna.stream()
-            .distinct()
-            .forEach(processo -> System.out.println("Memoria Interna - processo - PID: " + processo.getPid() +
-                    " tamanho: " + processo.getMemoria()));
+    if (memoriaInterna != null) {
+      memoriaInterna.stream()
+              .distinct()
+              .forEach(processo -> System.out.println("Memoria Interna - processo - PID: " + processo.getPid() +
+                      " tamanho: " + processo.getMemoria()));
+    }
+  }
+
+  /**
+   * Matar um processo que está sendo executado
+   */
+  public void terminar() {
+    System.out.print("Finalizar processo, PID: ");
+    int pidKill = scanner.nextInt();
+    int tamanho =  clusterMemoria.size();
+    for (int i=0; i < tamanho; i++) {
+      if(clusterMemoria.get(i).getPid() == pidKill) {
+        clusterMemoria.remove(i);
+      }
+    }
+    System.out.println("Processo " + pidKill + " finalizado");
   }
 
 }
