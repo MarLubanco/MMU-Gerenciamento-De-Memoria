@@ -98,7 +98,7 @@ public class ExecuteCommand {
    * Encontra o processo e mostra qual o endereço de memória que o processo
    * esta alocado
    */
-  public void acessoMemoriaFindProcesso() {
+  public void acessoMemoriaFindProcesso() throws Exception {
     System.out.print("PID do processo: ");
     ArrayList<Integer> endereco = new ArrayList<>();
     int pid = scanner.nextInt();
@@ -113,8 +113,7 @@ public class ExecuteCommand {
     if(endereco.size() == 0) {
       for( int i=0 ; i < memoriaInterna.size(); i++) {
         if(memoriaInterna.get(i).getPid() == pid) {
-          local = "Interna";
-          endereco.add(i);
+          throw new Exception("Não tem permissão para acessar esse processo no HD");
         }
       }
     }
