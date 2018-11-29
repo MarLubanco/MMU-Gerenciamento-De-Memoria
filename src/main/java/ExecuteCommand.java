@@ -19,12 +19,12 @@ public class ExecuteCommand {
    */
   public void comandosExistentesAjuda() {
     System.out.println("Comandos disponíveis:\n" +
-            "ajuda - Mostra a lista de comandos disponíveis.\n" +
-            "acesso - Simula o acesso à memória do processo.\n" +
-            "relatorio - Exibe o estado atual do sistema virtual.\n" +
-            "processo - Cria um novo processo no sistema virtual.\n" +
-            "terminar - Limpa totalmente o sistema virtual.\n" +
-            "configurar - Configura o ambiente um novo ambiente virtual.");
+            "ajuda - Mostra a lista de comandos disponíveis (está implementado).\n" +
+            "acesso - Simula o acesso à memória do processo (está implementado).\n" +
+            "relatorio - Exibe o estado atual do sistema virtual (está implementado).\n" +
+            "processo - Cria um novo processo no sistema virtual (está implementado).\n" +
+            "terminar - Limpa totalmente o sistema virtual (está implementado).\n" +
+            "configurar - Configura o ambiente um novo ambiente virtual (está implementado).");
   }
 
   /**
