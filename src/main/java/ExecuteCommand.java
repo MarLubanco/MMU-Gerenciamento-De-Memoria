@@ -97,27 +97,31 @@ public class ExecuteCommand {
     String memoriaFisica = scanner.next();
     System.out.print("Tipo de MMU: ");
     String mmu = scanner.next();
-    int memoriaFisicaValue = 0;
-    int value = 0;
-    if (!memoriaFisica.contains("x")) {
-      memoriaFisicaValue = Integer.parseInt(memoriaFisica);
+    if(!(mmu.equalsIgnoreCase("swapping") || mmu.equalsIgnoreCase("memoriavirtual"))) {
+      log.warning("ERRO - Não existe esse tipo de MMU");
     } else {
-      memoriaFisica = memoriaFisica.substring(2, memoriaFisica.length());
-      value = Integer.parseInt(memoriaFisica, 16);
+      int memoriaFisicaValue = 0;
+      int value = 0;
+      if (!memoriaFisica.contains("x")) {
+        memoriaFisicaValue = Integer.parseInt(memoriaFisica);
+      } else {
+        memoriaFisica = memoriaFisica.substring(2, memoriaFisica.length());
+        value = Integer.parseInt(memoriaFisica, 16);
+      }
+      if (mmu.equalsIgnoreCase("swapping")) {
+        memoriaInterna = new ArrayList<Processo>(memoriaFisicaValue > 0 ? memoriaFisicaValue : value);
+        configuracoes = new ConfigSystem(memoriaA, (memoriaFisicaValue > 0 ? memoriaFisicaValue : value), mmu);
+      } else if (mmu.equalsIgnoreCase("memoriavirtual")) {
+        paginas = new ArrayList<Processo>(memoriaFisicaValue > 0 ? memoriaFisicaValue : value);
+        memoriaPrincipals = new ArrayList<>(memoriaFisicaValue > 0 ? memoriaFisicaValue : value);
+        configuracoes = new ConfigSystem(memoriaA, (memoriaFisicaValue > 0 ? memoriaFisicaValue : value), mmu);
+      }
+      System.out.println("Configurações");
+      System.out.println("--------------------------------------------------");
+      System.out.println("Memória RAM (bits): " + memoriaA);
+      System.out.println("Memoria Interna (bits): " + (memoriaFisicaValue > 0 ? memoriaFisicaValue : value));
+      System.out.println("MMU: " + mmu);
     }
-    if(mmu.equalsIgnoreCase("swapping")) {
-      memoriaInterna = new ArrayList<Processo>(memoriaFisicaValue > 0 ? memoriaFisicaValue : value);
-      configuracoes = new ConfigSystem(memoriaA, (memoriaFisicaValue > 0 ? memoriaFisicaValue : value), mmu);
-    } else if (mmu.equalsIgnoreCase("memoriavirtual")) {
-      paginas = new ArrayList<Processo>(memoriaFisicaValue > 0 ? memoriaFisicaValue : value);
-      memoriaPrincipals = new ArrayList<>(memoriaFisicaValue > 0 ? memoriaFisicaValue : value);
-      configuracoes = new ConfigSystem(memoriaA, (memoriaFisicaValue > 0 ? memoriaFisicaValue : value), mmu);
-    }
-    System.out.println("Configurações");
-    System.out.println("--------------------------------------------------");
-    System.out.println("Memória RAM (bits): " + memoriaA);
-    System.out.println("Memoria Interna (bits): " + (memoriaFisicaValue > 0 ? memoriaFisicaValue : value));
-    System.out.println("MMU: " + mmu);
   }
 
 
