@@ -70,13 +70,19 @@ public class ExecuteCommand {
         }
 
       } else if(configuracoes.getMmu().equalsIgnoreCase("MemoriaVirtual")) {
-          pidMemoria += 1;
+        pidMemoria += 1;
+        Processo processo = new Processo(pid, (entradaMemoria > 0 ? entradaMemoria : value));
+        if(configuracoes.getMemoriaBits() >= processo.getMemoria()) {
+
           int pidPag = (int) (Math.random() * ((1000 - 1) + 1));
           Processo processoNovo = new Processo(pidPag, (entradaMemoria > 0 ? entradaMemoria : value));
-          MemoriaPrincipal memoriaPrincipal = new MemoriaPrincipal(pidMemoria,pidPag);
+          MemoriaPrincipal memoriaPrincipal = new MemoriaPrincipal(pidMemoria, pidPag);
           paginas.add(processoNovo);
           memoriaPrincipals.add(memoriaPrincipal);
-        log.info("Processo criado");
+          log.info("Processo criado");
+        } else {
+          log.warning("Erro- memória do processo maior que a do sistema");
+        }
       } else {
         log.warning("ERRO - Configurar sistema antes de iniciar um processo");
       }
