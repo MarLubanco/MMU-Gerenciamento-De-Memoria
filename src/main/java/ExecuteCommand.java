@@ -3,9 +3,12 @@ import model.ConfigSystem;
 import model.Processo;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ExecuteCommand {
+
+  static Logger log = Logger.getLogger(MMU.class.getName());
   private Map<Integer,Processo> lista = new HashMap<Integer, Processo>();
   private Integer pid = 0;
   private ConfigSystem configuracoes = null;
@@ -33,35 +36,38 @@ public class ExecuteCommand {
    */
   public void startProcess() throws Exception {
     if(configuracoes != null) {
-      pid += 1;
-      System.out.print("Novo processo - Memória do processo(bits): ");
-      String memoria = scanner.next();
-      int entradaMemoria = 0;
-      int value = 0;
-      if(!memoria.contains("x")) {
-        entradaMemoria = Integer.parseInt(memoria);
-      } else {
-        memoria = memoria.substring(2,memoria.length());
-        value = Integer.parseInt(memoria, 16);
-      }
-      Processo processo = new Processo(pid, (entradaMemoria > 0 ? entradaMemoria : value));
-      if(processo.getMemoria() <= configuracoes.getMemoriaBits()) {
-        if((memoriaA - clusterMemoria.size()) > processo.getMemoria()) {
-          for (int i = 0; i < processo.getMemoria(); i++) {
-            clusterMemoria.add(processo);
-          }
+      if (configuracoes.getMmu().equalsIgnoreCase("Swapping")) {
+        pid += 1;
+        System.out.print("Novo processo - Memória do processo(bits): ");
+        String memoria = scanner.next();
+        int entradaMemoria = 0;
+        int value = 0;
+        if (!memoria.contains("x")) {
+          entradaMemoria = Integer.parseInt(memoria);
         } else {
-          for(int i=0; i < processo.getMemoria(); i++) {
-            memoriaInterna.add(processo);
-          }
+          memoria = memoria.substring(2, memoria.length());
+          value = Integer.parseInt(memoria, 16);
         }
-      } else {
-        throw new Exception("Erro- memória do processo maior que a do sistema");
-      }
+        Processo processo = new Processo(pid, (entradaMemoria > 0 ? entradaMemoria : value));
+        if (processo.getMemoria() <= configuracoes.getMemoriaBits()) {
+          if ((memoriaA - clusterMemoria.size()) > processo.getMemoria()) {
+            for (int i = 0; i < processo.getMemoria(); i++) {
+              clusterMemoria.add(processo);
+            }
+          } else {
+            for (int i = 0; i < processo.getMemoria(); i++) {
+              memoriaInterna.add(processo);
+            }
+          }
+          log.info("Processo criado");
 
-      System.out.println("Processo criado");
-    } else {
-      throw new ConfigException("ERRO - Configurar sistema antes de iniciar um processo");
+        } else {
+          log.warning("Erro- memória do processo maior que a do sistema");
+        }
+
+      } else {
+         log.warning("ERRO - Configurar sistema antes de iniciar um processo");
+      }
     }
   }
 
@@ -78,6 +84,8 @@ public class ExecuteCommand {
     clusterMemoria = new ArrayList<Processo>((int) Math.round(memoriaA));
     System.out.print("Quantidade de memória física instalada (HD): ");
     String memoriaFisica = scanner.next();
+    System.out.print("Tipo de MMU: ");
+    String mmu = scanner.next();
     int memoriaFisicaValue = 0;
     int value = 0;
     if(!memoriaFisica.contains("x")) {
@@ -87,11 +95,12 @@ public class ExecuteCommand {
       value = Integer.parseInt(memoriaFisica, 16);
     }
     memoriaInterna = new ArrayList<Processo>(memoriaFisicaValue > 0 ? memoriaFisicaValue : value);
-    configuracoes = new ConfigSystem(memoriaA, (memoriaFisicaValue > 0 ? memoriaFisicaValue : value));
+    configuracoes = new ConfigSystem(memoriaA, (memoriaFisicaValue > 0 ? memoriaFisicaValue : value), mmu);
     System.out.println("Configurações");
     System.out.println("--------------------------------------------------");
     System.out.println("Memória RAM (bits): " + memoriaA);
     System.out.println("Memoria Interna (bits): " + (memoriaFisicaValue > 0 ? memoriaFisicaValue : value));
+    System.out.println("MMU: " + mmu);
   }
 
   /**
@@ -113,7 +122,7 @@ public class ExecuteCommand {
     if(endereco.size() == 0) {
       for( int i=0 ; i < memoriaInterna.size(); i++) {
         if(memoriaInterna.get(i).getPid() == pid) {
-          throw new Exception("Não tem permissão para acessar esse processo no HD");
+          log.warning("Não tem permissão para acessar esse processo no HD");
         }
       }
     }
@@ -130,10 +139,15 @@ public class ExecuteCommand {
     if (clusterMemoria == null) {
       System.out.println("Não existe processos ainda");
     }
+    System.out.println("           RELATÓRIO DE PROCESSOS");
+    System.out.println("==================================================");
     clusterMemoria.stream()
             .distinct()
-            .forEach(processo -> System.out.println("Memoria Principal - processo - PID: " + processo.getPid() +
-                    " tamanho: " + processo.getMemoria()));
+            .forEach(processo ->  {
+              if (processo.getPid() > 0)
+              System.out.println("Memoria Principal - processo - PID: " + processo.getPid() +
+                      " tamanho: " + processo.getMemoria());
+            });
     if (memoriaInterna != null) {
       memoriaInterna.stream()
               .distinct()
@@ -149,11 +163,15 @@ public class ExecuteCommand {
     System.out.print("Finalizar processo, PID: ");
     int pidKill = scanner.nextInt();
     int tamanho =  clusterMemoria.size();
-    for (int i=0; i < tamanho; i++) {
-      if(clusterMemoria.get(i).getPid() == pidKill) {
-        clusterMemoria.remove(i);
+    clusterMemoria.forEach(processo -> {
+      if(processo.getPid() == pidKill) {
+        processo.setPid(0);
+        processo.setMemoria(0);
       }
-    }
+    });
+//    for (int i=0; i <= clusterMemoria.size(); i++) {
+//
+//    }
     System.out.println("Processo " + pidKill + " finalizado");
   }
 

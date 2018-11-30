@@ -1,8 +1,5 @@
-import exception.ConfigException;
 import model.ConfigSystem;
-import model.Processo;
 
-import java.util.Optional;
 import java.util.Scanner;
 
 public class CommandReader {

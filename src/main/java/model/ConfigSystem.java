@@ -15,4 +15,5 @@ public class ConfigSystem {
 
   private Integer memoriaFisica;
 
+  private String mmu;
 }
